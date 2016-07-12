@@ -25,7 +25,7 @@ get '/users' do
   cards.collect { |k, v| k }.to_json
 end
 get '/chip-status/:name' do |name|
-  raise "Not a valid name!" unless name =~ /^[\w\s\\0-9:]+$/
+  raise "Not a valid name!" unless name =~ /^[\w\s\\0-9:\-]+$/
   content_type :json
   payload = {success: false, user: name, count: nil}
   if cards.key? name
