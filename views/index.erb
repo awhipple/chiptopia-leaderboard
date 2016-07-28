@@ -50,21 +50,36 @@
       $.get('./users').then(function(users){
         users.forEach(function(user) {
           $.get('/chip-status/' + encodeURI(user)).then(function(score){
-            var level = false;
+
+            var peppers = [];
+            var totalScore = 0;
+            for(var key in score.standing) {
+              if (!score.standing.hasOwnProperty(key)) continue;
+
+              var i = key[5]; //i.e. '3' in 'month3'
+              var monthScore = score.standing[key];
+              totalScore += parseInt(monthScore);
+
+              var level;
+              if(monthScore >= 11) {
+                level = 'hot';
+              } else if(monthScore >= 8) {
+                level = 'medium';
+              } else if(monthScore >= 4) {
+                level = 'mild';
+              } else {
+                level = 'none';
+              }
+
+              peppers[i] = level;
+            }
+
             var pepperText = '';
-
-            if(score.count >= 11) {
-              level = 'hot';
-            } else if(score.count >= 8) {
-              level = 'medium';
-            } else if(score.count >= 4) {
-              level = 'mild';
+            for (var i = 1; i <= 3; i++) {
+              pepperText += '<img class="pepper" src="/images/pepper-' + peppers[i] + '.png" />';
             }
 
-            if(level) {
-              pepperText = '<img class="pepper" src="/images/pepper-' + level + '.png" />';
-            }
-            user = {name: emojione.shortnameToImage(user), score: score.count, peppers: pepperText, level: level}
+            user = {name: emojione.shortnameToImage(user), score: totalScore, peppers: pepperText}
             addUserCallback(user);
           });
         });
